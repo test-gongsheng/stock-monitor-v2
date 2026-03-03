@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>股票投资监控系统 v2.0</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="header">
+        <div class="logo">
+            <i class="fas fa-chart-line"></i>
+            <span>股票投资监控系统 v2.0</span>
+        </div>
+        <div class="market-status">
+            <span class="status-dot" id="marketStatusDot"></span>
+            <span id="marketStatusText">加载中...</span>
+        </div>
+        <div class="current-time" id="currentTime"></div>
+    </header>
+
+    <!-- 顶部资产概览 -->
+    <section class="asset-overview">
+        <div class="asset-card">
+            <div class="asset-label">总投资额度</div>
+            <div class="asset-value">800万</div>
+        </div>
+        <div class="asset-card">
+            <div class="asset-label">当前持仓</div>
+            <div class="asset-value" id="totalPosition">--</div>
+        </div>
+        <div class="asset-card">
+            <div class="asset-label">可用现金</div>
+            <div class="asset-value" id="availableCash">--</div>
+        </div>
+        <div class="asset-card">
+            <div class="asset-label">今日盈亏</div>
+            <div class="asset-value" id="todayPnL">
+                <span class="pnl-value">--</span>
+                <span class="pnl-percent">--</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 主内容区 -->
+    <main class="main-container">
+        <!-- 左侧：自选股列表 -->
+        <aside class="sidebar-left">
+            <div class="panel-header">
+                <h3><i class="fas fa-list"></i> 自选股</h3>
+                <button class="btn-add" onclick="showAddStockModal()">
+                    <i class="fas fa-plus"></i> 添加
+                </button>
+            </div>
+            <div class="stock-list" id="stockList">
+                <!-- 动态生成 -->
+            </div>
+        </aside>
+
+        <!-- 中间：股票详情 -->
+        <section class="main-content">
+            <div class="stock-detail" id="stockDetail">
+                <div class="detail-header">
+                    <div class="stock-title">
+                        <span class="stock-name" id="detailName">--</span>
+                        <span class="stock-code" id="detailCode">--</span>
+                        <span class="strategy-badge" id="detailStrategy">--</span>
+                    </div>
+                    <div class="stock-price">
+                        <span class="current-price" id="detailPrice">--</span>
+                        <span class="price-change" id="detailChange">--</span>
+                    </div>
+                </div>
+
+                <!-- 策略信息卡片 -->
+                <div class="strategy-cards">
+                    <div class="strategy-card">
+                        <div class="card-title">投资上限</div>
+                        <div class="card-value" id="detailLimit">--</div>
+                    </div>
+                    <div class="strategy-card">
+                        <div class="card-title">当前持仓</div>
+                        <div class="card-value" id="detailPosition">--</div>
+                    </div>
+                    <div class="strategy-card">
+                        <div class="card-title">浮动盈亏</div>
+                        <div class="card-value" id="detailPnL">--</div>
+                    </div>
+                    <div class="strategy-card highlight">
+                        <div class="card-title">中轴价格</div>
+                        <div class="card-value" id="detailPivot">--</div>
+                    </div>
+                    <div class="strategy-card">
+                        <div class="card-title">底仓比例</div>
+                        <div class="card-value" id="detailBase">--</div>
+                    </div>
+                    <div class="strategy-card">
+                        <div class="card-title">浮动仓比例</div>
+                        <div class="card-value" id="detailFloat">--</div>
+                    </div>
+                </div>
+
+                <!-- 触发价格显示 -->
+                <div class="trigger-prices">
+                    <div class="trigger-box buy">
+                        <div class="trigger-label">下次买入触发价</div>
+                        <div class="trigger-price" id="triggerBuy">--</div>
+                        <div class="trigger-distance" id="distanceBuy">--</div>
+                    </div>
+                    <div class="trigger-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                            <div class="progress-markers">
+                                <span class="marker buy" id="markerBuy"></span>
+                                <span class="marker current" id="markerCurrent"></span>
+                                <span class="marker sell" id="markerSell"></span>
+                            </div>
+                        </div>
+                        <div class="progress-labels">
+                            <span>-8%</span>
+                            <span>中轴</span>
+                            <span>+8%</span>
+                        </div>
+                    </div>
+                    <div class="trigger-box sell">
+                        <div class="trigger-label">下次卖出触发价</div>
+                        <div class="trigger-price" id="triggerSell">--</div>
+                        <div class="trigger-distance" id="distanceSell">--</div>
+                    </div>
+                </div>
+
+                <!-- 操作建议 -->
+                <div class="action-suggestion" id="actionSuggestion">
+                    <div class="suggestion-title">操作建议</div>
+                    <div class="suggestion-content" id="suggestionContent">--</div>
+                </div>
+
+                <!-- K线图区域 -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <span class="chart-title">K线图</span>
+                        <div class="chart-periods">
+                            <button class="period-btn active">日K</button>
+                            <button class="period-btn">周K</button>
+                            <button class="period-btn">月K</button>
+                        </div>
+                    </div>
+                    <div class="chart-area" id="klineChart">
+                        <div class="placeholder">K线图加载中...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 右侧：实时情报 -->
+        <aside class="sidebar-right">
+            <!-- 热点板块 -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h3><i class="fas fa-fire"></i> 热点板块</h3>
+                </div>
+                <div class="hot-sectors" id="hotSectors">
+                    <!-- 动态生成 -->
+                </div>
+            </div>
+
+            <!-- 最新新闻 -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h3><i class="fas fa-newspaper"></i> 最新新闻</h3>
+                </div>
+                <div class="news-list" id="newsList">
+                    <!-- 动态生成 -->
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- 底部提醒日志 -->
+    <footer class="footer">
+        <div class="alert-log">
+            <div class="log-header">
+                <i class="fas fa-bell"></i>
+                <span>提醒日志</span>
+            </div>
+            <div class="log-content" id="alertLog">
+                <!-- 动态生成 -->
+            </div>
+        </div>
+    </footer>
+
+    <!-- 添加股票弹窗 -->
+    <div class="modal" id="addStockModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>添加自选股</h3>
+                <button class="btn-close" onclick="hideAddStockModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addStockForm">
+                    <div class="form-group">
+                        <label>股票代码</label>
+                        <input type="text" id="stockCode" placeholder="如：09988.HK 或 000001.SZ" required>
+                    </div>
+                    <div class="form-group">
+                        <label>股票名称</label>
+                        <input type="text" id="stockName" placeholder="如：阿里巴巴-W" required>
+                    </div>
+                    <div class="form-group">
+                        <label>市场类型</label>
+                        <select id="marketType">
+                            <option value="A股">A股</option>
+                            <option value="港股">港股</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>投资上限（万元）</label>
+                        <input type="number" id="investLimit" placeholder="A股默认50，港股默认150" required>
+                    </div>
+                    <div class="form-group">
+                        <label>当前持仓数量</label>
+                        <input type="number" id="holdQuantity" placeholder="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>持仓成本</label>
+                        <input type="number" id="holdCost" placeholder="0" value="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>策略模式</label>
+                        <select id="strategyMode">
+                            <option value="基础">基础策略（中轴价格±8%）</option>
+                            <option value="进阶">进阶策略（个性化网格）</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel" onclick="hideAddStockModal()">取消</button>
+                        <button type="submit" class="btn-submit">添加</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 买卖提醒弹窗 -->
+    <div class="modal alert-modal" id="tradeAlertModal">
+        <div class="modal-content">
+            <div class="modal-header alert-header">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>买卖提醒</h3>
+            </div>
+            <div class="modal-body">
+                <div class="alert-content" id="tradeAlertContent">
+                    <!-- 动态生成 -->
+                </div>
+                <div class="alert-actions">
+                    <button class="btn-confirm" onclick="confirmTrade()">确认</button>
+                    <button class="btn-snooze" onclick="snoozeAlert()">稍后提醒</button>
+                    <button class="btn-ignore" onclick="ignoreAlert()">忽略</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
