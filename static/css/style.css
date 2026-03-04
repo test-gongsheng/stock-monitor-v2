@@ -1,786 +1,876 @@
-/* 全局样式 */
 :root {
-  --primary-color: #2563eb;
-  --primary-dark: #1d4ed8;
-  --success-color: #10b981;
-  --warning-color: #f59e0b;
-  --danger-color: #ef4444;
-  --info-color: #3b82f6;
-  --dark-bg: #0f172a;
-  --card-bg: #1e293b;
-  --border-color: #334155;
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --p0-color: #dc2626;
-  --p1-color: #ea580c;
-  --p2-color: #ca8a04;
+    --bg-primary: #0a0e1a;
+    --bg-secondary: #141824;
+    --bg-card: #1a1f2e;
+    --bg-hover: #252b3d;
+    --border-color: #2d3548;
+    --text-primary: #e8eaed;
+    --text-secondary: #9aa0a6;
+    --text-muted: #5f6368;
+    --color-up: #ff4d4f;
+    --color-down: #52c41a;
+    --color-gold: #faad14;
+    --color-blue: #1890ff;
+    --color-purple: #722ed1;
+    --p0-color: #ff4d4f;
+    --p1-color: #faad14;
+    --p2-color: #52c41a;
 }
 
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  color: var(--text-primary);
-  min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
 }
 
-/* 头部样式 */
+/* 顶部导航 */
 .header {
-  background: rgba(15, 23, 42, 0.95);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border-color);
-  padding: 1rem 2rem;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.header-content {
-  max-width: 1600px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .logo {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 18px;
+    font-weight: 600;
 }
 
-.logo-icon {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, var(--primary-color), var(--info-color));
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
+.logo i {
+    color: var(--color-gold);
+    font-size: 24px;
 }
 
-.logo h1 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.version {
+    background: var(--color-blue);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
 }
 
-.portfolio-summary {
-  display: flex;
-  gap: 2rem;
-  align-items: center;
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 24px;
 }
 
-.summary-item {
-  text-align: center;
+.market-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
 }
 
-.summary-item .label {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-down);
 }
 
-.summary-item .value {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--text-primary);
+.status-dot.active {
+    background: var(--color-up);
+    box-shadow: 0 0 8px var(--color-up);
 }
 
-.summary-item .value.positive {
-  color: var(--success-color);
+.current-time {
+    color: var(--text-secondary);
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
 }
 
-.summary-item .value.negative {
-  color: var(--danger-color);
+/* 资产总览 */
+.asset-overview {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    padding: 20px 24px;
+    background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
 }
 
-/* 主容器 */
-.container {
-  max-width: 1600px;
-  margin: 0 auto;
-  padding: 1.5rem;
+.asset-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.3s ease;
 }
 
-/* 网格布局 */
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 1.5rem;
+.asset-card:hover {
+    border-color: var(--color-blue);
+    transform: translateY(-2px);
 }
 
-/* 卡片样式 */
-.card {
-  background: var(--card-bg);
-  border-radius: 16px;
-  border: 1px solid var(--border-color);
-  overflow: hidden;
+.asset-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--bg-hover);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: var(--color-gold);
 }
 
-.card-header {
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid var(--border-color);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.asset-info {
+    flex: 1;
 }
 
-.card-title {
-  font-size: 1rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.asset-label {
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin-bottom: 4px;
 }
 
-.card-title .icon {
-  font-size: 1.125rem;
+.asset-value {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
-.card-body {
-  padding: 1.25rem;
+.asset-value .pnl-percent {
+    font-size: 14px;
+    margin-left: 8px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: var(--bg-hover);
 }
 
-/* 区域布局 */
-.watchlist-section {
-  grid-column: span 8;
+.pnl-negative .asset-value {
+    color: var(--color-down);
 }
 
-.alerts-section {
-  grid-column: span 4;
+.pnl-negative .pnl-percent {
+    color: var(--color-down);
 }
 
-.sentiment-section {
-  grid-column: span 6;
+/* 仓位环形图 */
+.position-ring {
+    position: relative;
+    width: 48px;
+    height: 48px;
 }
 
-.hot-sectors-section {
-  grid-column: span 6;
+.position-ring svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
 }
 
-.risk-section {
-  grid-column: span 12;
+.ring-bg {
+    fill: none;
+    stroke: var(--bg-hover);
+    stroke-width: 3;
 }
 
-/* 表格样式 */
-.table-container {
-  overflow-x: auto;
+.ring-fill {
+    fill: none;
+    stroke: var(--color-gold);
+    stroke-width: 3;
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.5s ease;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.875rem;
+.ring-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-gold);
 }
 
-thead th {
-  text-align: left;
-  padding: 0.75rem;
-  color: var(--text-secondary);
-  font-weight: 500;
-  border-bottom: 1px solid var(--border-color);
-  white-space: nowrap;
+/* 主内容区 */
+.main-container {
+    display: grid;
+    grid-template-columns: 280px 1fr 300px;
+    gap: 16px;
+    padding: 0 24px 20px;
+    min-height: calc(100vh - 200px);
 }
 
-tbody td {
-  padding: 0.75rem;
-  border-bottom: 1px solid var(--border-color);
-  color: var(--text-primary);
+/* 侧边栏 */
+.sidebar-left, .sidebar-right {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
 }
 
-tbody tr:hover {
-  background: rgba(255, 255, 255, 0.02);
+.panel-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
-tbody tr:last-child td {
-  border-bottom: none;
+.panel-header h3 {
+    font-size: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.stock-code {
-  font-family: 'Courier New', monospace;
-  font-weight: 600;
-  color: var(--primary-color);
+.panel-header h3 i {
+    color: var(--color-gold);
+}
+
+.stock-count, .alert-count {
+    background: var(--color-blue);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    margin-left: 8px;
+}
+
+.btn-add {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    background: var(--color-blue);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-add:hover {
+    background: #40a9ff;
+    transform: scale(1.05);
+}
+
+/* 股票列表 */
+.stock-list-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    padding: 12px 16px;
+    background: var(--bg-hover);
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.stock-list {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.stock-item {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: all 0.2s;
+    align-items: center;
+}
+
+.stock-item:hover {
+    background: var(--bg-hover);
+}
+
+.stock-item.active {
+    background: rgba(24, 144, 255, 0.1);
+    border-left: 3px solid var(--color-blue);
+}
+
+.stock-name-cell {
+    display: flex;
+    flex-direction: column;
+}
+
+.stock-name-cell .name {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.stock-name-cell .code {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* 主内容区 */
+.main-content {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
+}
+
+/* 股票详情头部 */
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.stock-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
 .stock-name {
-  font-weight: 500;
+    font-size: 24px;
+    font-weight: 600;
 }
 
-.market-badge {
-  display: inline-block;
-  padding: 0.125rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 500;
+.stock-code {
+    color: var(--text-secondary);
+    font-size: 14px;
 }
 
-.market-badge.a-share {
-  background: rgba(16, 185, 129, 0.15);
-  color: var(--success-color);
+.market-tag {
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
 }
 
-.market-badge.hk-share {
-  background: rgba(59, 130, 246, 0.15);
-  color: var(--info-color);
+.market-tag.hk {
+    background: rgba(82, 196, 26, 0.15);
+    color: var(--color-down);
 }
 
-.price-up {
-  color: var(--success-color);
-}
-
-.price-down {
-  color: var(--danger-color);
+.market-tag.a {
+    background: rgba(255, 77, 79, 0.15);
+    color: var(--color-up);
 }
 
 .priority-badge {
-  display: inline-block;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
 }
 
-.priority-p0 {
-  background: rgba(220, 38, 38, 0.15);
-  color: var(--p0-color);
+.priority-badge.p0 {
+    background: var(--p0-color);
+    color: white;
 }
 
-.priority-p1 {
-  background: rgba(234, 88, 12, 0.15);
-  color: var(--p1-color);
+.priority-badge.p1 {
+    background: var(--p1-color);
+    color: white;
 }
 
-.priority-p2 {
-  background: rgba(202, 138, 4, 0.15);
-  color: var(--p2-color);
+.stock-price-section {
+    text-align: right;
 }
 
-/* 按钮样式 */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s;
+.current-price {
+    font-size: 32px;
+    font-weight: 700;
+    display: block;
 }
 
-.btn-primary {
-  background: var(--primary-color);
-  color: white;
+.price-change-group {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 4px;
 }
 
-.btn-primary:hover {
-  background: var(--primary-dark);
+/* 策略信息网格 */
+.strategy-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
 }
 
-.btn-success {
-  background: var(--success-color);
-  color: white;
+.info-card {
+    background: var(--bg-hover);
+    border-radius: 10px;
+    padding: 16px;
+    border: 1px solid var(--border-color);
 }
 
-.btn-danger {
-  background: var(--danger-color);
-  color: white;
+.info-card.highlight {
+    border-color: var(--color-gold);
+    background: rgba(250, 173, 20, 0.05);
 }
 
-.btn-sm {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.75rem;
+.card-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
 }
 
-.btn-icon {
-  padding: 0.5rem;
-  background: transparent;
-  border: 1px solid var(--border-color);
-  color: var(--text-secondary);
+.card-value {
+    font-size: 20px;
+    font-weight: 600;
 }
 
-.btn-icon:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-primary);
+.card-value.up {
+    color: var(--color-up);
 }
 
-/* 提醒列表 */
-.alert-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+.card-value.down {
+    color: var(--color-down);
 }
 
-.alert-item {
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 12px;
-  padding: 1rem;
-  border-left: 4px solid;
-  transition: all 0.2s;
+/* 中轴价格可视化 */
+.pivot-section {
+    background: var(--bg-hover);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
 }
 
-.alert-item:hover {
-  background: rgba(255, 255, 255, 0.04);
+.pivot-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
 }
 
-.alert-item.p0 {
-  border-left-color: var(--p0-color);
+.pivot-title {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.alert-item.p1 {
-  border-left-color: var(--p1-color);
+.pivot-title i {
+    color: var(--color-gold);
 }
 
-.alert-item.p2 {
-  border-left-color: var(--p2-color);
+.pivot-range {
+    font-size: 13px;
+    color: var(--text-secondary);
 }
 
-.alert-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
+.pivot-bar-container {
+    position: relative;
 }
 
-.alert-stock {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.pivot-bar {
+    height: 40px;
+    background: var(--bg-card);
+    border-radius: 8px;
+    display: flex;
+    overflow: hidden;
+    position: relative;
 }
 
-.alert-stock .code {
-  font-weight: 600;
-  font-family: 'Courier New', monospace;
+.pivot-zone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 500;
 }
 
-.alert-stock .name {
-  color: var(--text-secondary);
-  font-size: 0.875rem;
+.pivot-zone.buy-zone {
+    width: 30%;
+    background: rgba(82, 196, 26, 0.2);
+    color: var(--color-down);
 }
 
-.alert-message {
-  font-size: 0.875rem;
-  color: var(--text-primary);
-  line-height: 1.5;
-  margin-bottom: 0.5rem;
+.pivot-zone.hold-zone {
+    width: 40%;
+    background: rgba(250, 173, 20, 0.1);
+    color: var(--color-gold);
 }
 
-.alert-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.pivot-zone.sell-zone {
+    width: 30%;
+    background: rgba(255, 77, 79, 0.2);
+    color: var(--color-up);
 }
 
-.alert-time {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
+.pivot-marker {
+    position: absolute;
+    top: -5px;
+    width: 4px;
+    height: 50px;
+    background: var(--color-gold);
+    border-radius: 2px;
+    box-shadow: 0 0 10px var(--color-gold);
 }
 
-.alert-actions {
-  display: flex;
-  gap: 0.5rem;
+.pivot-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--text-secondary);
 }
 
-/* 市场情绪 */
-.sentiment-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
+/* 操作建议 */
+.suggestion-box {
+    background: linear-gradient(135deg, rgba(24, 144, 255, 0.1), rgba(114, 46, 209, 0.1));
+    border: 1px solid var(--color-blue);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
 }
 
-.sentiment-item {
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 12px;
-  padding: 1rem;
+.suggestion-title {
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.sentiment-item .label {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  margin-bottom: 0.5rem;
+.suggestion-title i {
+    color: var(--color-gold);
 }
 
-.sentiment-item .value {
-  font-size: 1.5rem;
-  font-weight: 700;
+.tag {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-right: 8px;
 }
 
-.sentiment-bar {
-  height: 8px;
-  background: var(--border-color);
-  border-radius: 4px;
-  margin-top: 0.5rem;
-  overflow: hidden;
+.tag.hold {
+    background: var(--color-gold);
+    color: var(--bg-primary);
 }
 
-.sentiment-bar .fill {
-  height: 100%;
-  border-radius: 4px;
-  transition: width 0.3s;
+/* 网格策略 */
+.grid-section {
+    background: var(--bg-hover);
+    border-radius: 10px;
+    padding: 20px;
 }
 
-.sentiment-bar .fill.positive {
-  background: linear-gradient(90deg, var(--success-color), #34d399);
+.grid-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
 }
 
-.sentiment-bar .fill.neutral {
-  background: linear-gradient(90deg, var(--warning-color), #fbbf24);
+.grid-mode {
+    font-size: 13px;
+    color: var(--text-secondary);
+    background: var(--bg-card);
+    padding: 4px 12px;
+    border-radius: 4px;
 }
 
-.sentiment-bar .fill.negative {
-  background: linear-gradient(90deg, var(--danger-color), #f87171);
+.grid-table {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
-.news-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 1rem;
+.grid-row {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 1fr 1.5fr;
+    padding: 12px 16px;
+    border-radius: 8px;
+    align-items: center;
 }
 
-.news-tag {
-  background: rgba(59, 130, 246, 0.15);
-  color: var(--info-color);
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
+.grid-row.header {
+    background: var(--bg-card);
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
 }
 
-/* 热点板块 */
-.sector-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+.grid-row.buy {
+    background: rgba(82, 196, 26, 0.1);
+}
+
+.grid-row.sell {
+    background: rgba(255, 77, 79, 0.1);
+}
+
+.tag-buy, .tag-sell {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.tag-buy {
+    background: var(--color-down);
+    color: white;
+}
+
+.tag-sell {
+    background: var(--color-up);
+    color: white;
+}
+
+/* 右侧边栏 */
+.sector-list, .alert-list {
+    padding: 12px;
 }
 
 .sector-item {
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 12px;
-  padding: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: all 0.2s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color);
 }
 
-.sector-item:hover {
-  background: rgba(255, 255, 255, 0.04);
-}
-
-.sector-info {
-  flex: 1;
+.sector-item:last-child {
+    border-bottom: none;
 }
 
 .sector-name {
-  font-weight: 600;
-  margin-bottom: 0.25rem;
-}
-
-.sector-leaders {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
+    font-weight: 500;
 }
 
 .sector-change {
-  text-align: right;
+    font-weight: 600;
 }
 
-.sector-change .value {
-  font-size: 1.25rem;
-  font-weight: 700;
+.sector-change.up, .up {
+    color: var(--color-up);
 }
 
-.sector-change .value.up {
-  color: var(--success-color);
+.sector-change.down, .down {
+    color: var(--color-down);
 }
 
-.sector-change .value.down {
-  color: var(--danger-color);
+/* 提醒列表 */
+.alert-item {
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-color);
+    align-items: flex-start;
 }
 
-.sector-change .count {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-}
-
-/* 风险控制 */
-.risk-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-}
-
-.risk-item {
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 12px;
-  padding: 1.25rem;
-  text-align: center;
-}
-
-.risk-item .label {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  margin-bottom: 0.5rem;
-}
-
-.risk-item .value {
-  font-size: 1.75rem;
-  font-weight: 700;
-}
-
-.risk-item .value.safe {
-  color: var(--success-color);
-}
-
-.risk-item .value.warning {
-  color: var(--warning-color);
-}
-
-.risk-item .value.danger {
-  color: var(--danger-color);
-}
-
-.risk-progress {
-  height: 6px;
-  background: var(--border-color);
-  border-radius: 3px;
-  margin-top: 0.75rem;
-  overflow: hidden;
-}
-
-.risk-progress .fill {
-  height: 100%;
-  border-radius: 3px;
-  transition: width 0.3s;
-}
-
-.risk-progress .fill.safe {
-  background: var(--success-color);
-}
-
-.risk-progress .fill.warning {
-  background: var(--warning-color);
-}
-
-.risk-progress .fill.danger {
-  background: var(--danger-color);
-}
-
-/* 模态框 */
-.modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  z-index: 1000;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal.active {
-  display: flex;
-}
-
-.modal-content {
-  background: var(--card-bg);
-  border-radius: 16px;
-  width: 90%;
-  max-width: 600px;
-  max-height: 90vh;
-  overflow: hidden;
-  border: 1px solid var(--border-color);
-}
-
-.modal-header {
-  padding: 1.25rem;
-  border-bottom: 1px solid var(--border-color);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.modal-title {
-  font-size: 1.125rem;
-  font-weight: 600;
-}
-
-.modal-close {
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-.modal-close:hover {
-  color: var(--text-primary);
-}
-
-.modal-body {
-  padding: 1.25rem;
-  overflow-y: auto;
-  max-height: 60vh;
-}
-
-.modal-footer {
-  padding: 1rem 1.25rem;
-  border-top: 1px solid var(--border-color);
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-}
-
-/* 表单样式 */
-.form-group {
-  margin-bottom: 1rem;
-}
-
-.form-label {
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-  color: var(--text-secondary);
-}
-
-.form-input,
-.form-select {
-  width: 100%;
-  padding: 0.625rem 0.875rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  color: var(--text-primary);
-  font-size: 0.875rem;
-  transition: all 0.2s;
-}
-
-.form-input:focus,
-.form-select:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-}
-
-/* 网格策略编辑器 */
-.grid-editor {
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 12px;
-  padding: 1rem;
-  margin-top: 1rem;
-}
-
-.grid-editor h4 {
-  font-size: 0.875rem;
-  margin-bottom: 0.75rem;
-  color: var(--text-secondary);
-}
-
-.grid-levels {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.grid-level {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr auto;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-/* 响应式 */
-@media (max-width: 1200px) {
-  .watchlist-section {
-    grid-column: span 12;
-  }
-  
-  .alerts-section {
-    grid-column: span 12;
-  }
-  
-  .sentiment-section,
-  .hot-sectors-section {
-    grid-column: span 6;
-  }
-}
-
-@media (max-width: 768px) {
-  .header-content {
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .portfolio-summary {
-    flex-wrap: wrap;
+.alert-level {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
     justify-content: center;
-  }
-  
-  .sentiment-section,
-  .hot-sectors-section {
-    grid-column: span 12;
-  }
-  
-  .risk-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .form-row {
-    grid-template-columns: 1fr;
-  }
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
 }
 
-/* 动画 */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.alert-item.p0 .alert-level {
+    background: var(--p0-color);
+    color: white;
 }
 
-.card {
-  animation: fadeIn 0.3s ease-out;
+.alert-item.p1 .alert-level {
+    background: var(--p1-color);
+    color: white;
+}
+
+.alert-item.p2 .alert-level {
+    background: var(--p2-color);
+    color: white;
+}
+
+.alert-stock {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.alert-msg {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+/* 数据导入区域 */
+.data-import-section {
+    margin: 0 24px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.import-header {
+    margin-bottom: 20px;
+}
+
+.import-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.import-header h3 i {
+    color: var(--color-blue);
+}
+
+.import-header p {
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+.import-area {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+}
+
+.upload-box {
+    flex: 1;
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.upload-box:hover {
+    border-color: var(--color-blue);
+    background: rgba(24, 144, 255, 0.05);
+}
+
+.upload-box i {
+    font-size: 48px;
+    color: var(--color-blue);
+    margin-bottom: 16px;
+}
+
+.upload-box p {
+    color: var(--text-secondary);
+}
+
+.click-upload {
+    color: var(--color-blue);
+    cursor: pointer;
+}
+
+.import-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn-analyze, .btn-history {
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: none;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+}
+
+.btn-analyze {
+    background: var(--color-blue);
+    color: white;
+}
+
+.btn-analyze:hover {
+    background: #40a9ff;
+}
+
+.btn-history {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-history:hover {
+    border-color: var(--color-blue);
+}
+
+/* 底部 */
+.footer {
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-color);
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.footer .separator {
+    margin: 0 12px;
+    color: var(--text-muted);
 }
 
 /* 滚动条 */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+    width: 6px;
+    height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--dark-bg);
+    background: var(--bg-primary);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 4px;
+    background: var(--border-color);
+    border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+    background: var(--text-muted);
+}
+
+/* 响应式 */
+@media (max-width: 1400px) {
+    .main-container {
+        grid-template-columns: 260px 1fr 260px;
+    }
+    
+    .asset-overview {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 1200px) {
+    .main-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .sidebar-left, .sidebar-right {
+        display: none;
+    }
 }
