@@ -462,35 +462,68 @@ function formatMoney(amount) {
 
 // 数据导入功能
 function initDataImport() {
-    const uploadBox = document.getElementById('uploadBox');
+    // 获取数据导入相关的DOM元素
+    const uploadArea = document.getElementById('uploadArea');
     const fileInput = document.getElementById('fileInput');
+    const dataImportBtn = document.getElementById('dataImportBtn');
     
-    if (!uploadBox || !fileInput) return;
+    console.log('初始化数据导入功能:', { uploadArea, fileInput, dataImportBtn });
     
-    // 点击上传
-    uploadBox.addEventListener('click', () => fileInput.click());
+    // 绑定导入按钮点击事件
+    if (dataImportBtn) {
+        dataImportBtn.addEventListener('click', showDataImportModal);
+    }
     
-    // 文件选择
-    fileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) handleFileUpload(file);
-    });
+    // 绑定文件上传区域事件
+    if (uploadArea && fileInput) {
+        // 点击上传区域触发文件选择
+        uploadArea.addEventListener('click', (e) => {
+            if (e.target !== fileInput) {
+                fileInput.click();
+            }
+        });
+        
+        // 文件选择事件
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                console.log('选择文件:', file.name);
+                handleFileUpload(file);
+            }
+        });
+        
+        // 拖拽上传事件
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                console.log('拖拽文件:', file.name);
+                handleFileUpload(file);
+            }
+        });
+    }
     
-    // 拖拽上传
-    uploadBox.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadBox.classList.add('dragover');
-    });
-    
-    uploadBox.addEventListener('dragleave', () => {
-        uploadBox.classList.remove('dragover');
-    });
-    
-    uploadBox.addEventListener('drop', (e) => {
-        e.preventDefault();
-        uploadBox.classList.remove('dragover');
-        const file = e.dataTransfer.files[0];
-        if (file) handleFileUpload(file);
+    // 绑定导入标签页切换
+    const importTabs = document.querySelectorAll('.import-tab');
+    importTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const tabName = tab.dataset.tab;
+            switchImportTab(tabName);
+        });
     });
 }
 
@@ -546,7 +579,51 @@ function parseStockData(content) {
     }
 }
 
-// 解析单行数据（适配实际券商格式）
+// 显示数据导入弹窗
+function showDataImportModal() {
+    const modal = document.getElementById('dataImportModal');
+    if (modal) {
+        modal.classList.add('show');
+        console.log('显示数据导入弹窗');
+    }
+}
+
+// 隐藏数据导入弹窗
+function hideDataImportModal() {
+    const modal = document.getElementById('dataImportModal');
+    if (modal) {
+        modal.classList.remove('show');
+    }
+}
+
+// 切换导入标签页
+function switchImportTab(tabName) {
+    // 更新标签按钮状态
+    document.querySelectorAll('.import-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.tab === tabName);
+    });
+    
+    // 更新内容区域显示
+    document.querySelectorAll('.import-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    const targetContent = document.getElementById(tabName + 'Tab');
+    if (targetContent) {
+        targetContent.classList.add('active');
+    }
+}
+
+// 清除已选文件
+function clearFile() {
+    const fileInput = document.getElementById('fileInput');
+    const filePreview = document.getElementById('filePreview');
+    const uploadArea = document.getElementById('uploadArea');
+    
+    if (fileInput) fileInput.value = '';
+    if (filePreview) filePreview.style.display = 'none';
+    if (uploadArea) uploadArea.style.display = 'block';
+}
 function parseStockLine(line) {
     try {
         // 按空白字符分割
