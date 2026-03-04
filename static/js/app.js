@@ -460,5 +460,192 @@ function formatMoney(amount) {
     }
 }
 
+// 数据导入功能
+function initDataImport() {
+    const uploadBox = document.getElementById('uploadBox');
+    const fileInput = document.getElementById('fileInput');
+    
+    if (!uploadBox || !fileInput) return;
+    
+    // 点击上传
+    uploadBox.addEventListener('click', () => fileInput.click());
+    
+    // 文件选择
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) handleFileUpload(file);
+    });
+    
+    // 拖拽上传
+    uploadBox.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadBox.classList.add('dragover');
+    });
+    
+    uploadBox.addEventListener('dragleave', () => {
+        uploadBox.classList.remove('dragover');
+    });
+    
+    uploadBox.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadBox.classList.remove('dragover');
+        const file = e.dataTransfer.files[0];
+        if (file) handleFileUpload(file);
+    });
+}
+
+// 处理文件上传
+function handleFileUpload(file) {
+    if (!file.name.endsWith('.txt')) {
+        alert('请上传记事本格式的.txt文件');
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const content = e.target.result;
+        parseStockData(content);
+    };
+    reader.readAsText(file, 'GBK'); // 券商导出文件通常是GBK编码
+}
+
+// 解析持仓数据
+function parseStockData(content) {
+    const lines = content.split('\n');
+    const stocks = [];
+    let isDataSection = false;
+    
+    for (const line of lines) {
+        // 跳过空行和分隔线
+        if (!line.trim() || line.includes('---')) continue;
+        
+        // 检测数据开始（通常是表头后的数据行）
+        if (line.includes('证券代码') || line.includes('股票代码')) {
+            isDataSection = true;
+            continue;
+        }
+        
+        // 解析数据行
+        if (isDataSection) {
+            const parts = line.trim().split(/\s+/);
+            if (parts.length >= 10) {
+                const stock = parseStockLine(parts);
+                if (stock) stocks.push(stock);
+            }
+        }
+    }
+    
+    if (stocks.length > 0) {
+        // 更新到系统中
+        updateStocksFromImport(stocks);
+        alert(`成功导入 ${stocks.length} 只股票数据！`);
+        addAlertLog(`导入持仓数据：${stocks.length}只股票`);
+    } else {
+        alert('未能解析到股票数据，请检查文件格式');
+    }
+}
+
+// 解析单行数据
+function parseStockLine(parts) {
+    try {
+        const code = parts[0];
+        const name = parts[1];
+        const shares = parseInt(parts[2]) || 0;
+        const availableShares = parseInt(parts[4]) || 0;
+        const costPrice = parseFloat(parts[5]) || 0;
+        const currentPrice = parseFloat(parts[6]) || 0;
+        const marketValue = parseFloat(parts[7]) || 0;
+        
+        // 判断市场类型
+        let market = 'A股';
+        if (code.length === 5 || (code.startsWith('0') && code.length === 5)) {
+            market = '港股';
+        }
+        
+        // 计算中轴价格（简化：使用成本价或当前价的平均值）
+        const pivotPrice = costPrice > 0 ? costPrice : currentPrice;
+        
+        return {
+            code: code,
+            name: name,
+            market: market,
+            price: currentPrice,
+            change: 0,
+            changePercent: 0,
+            investLimit: market === '港股' ? 1500000 : 500000,
+            holdQuantity: shares,
+            holdCost: costPrice,
+            strategy: '基础',
+            pivotPrice: pivotPrice,
+            baseRatio: 50,
+            floatRatio: 50,
+            triggerBuy: pivotPrice * 0.92,
+            triggerSell: pivotPrice * 1.08
+        };
+    } catch (e) {
+        console.error('解析股票数据失败:', e);
+        return null;
+    }
+}
+
+// 更新股票数据
+function updateStocksFromImport(newStocks) {
+    // 合并或替换现有数据
+    newStocks.forEach(newStock => {
+        const existingIndex = appState.stocks.findIndex(s => s.code === newStock.code);
+        if (existingIndex >= 0) {
+            // 更新现有股票
+            appState.stocks[existingIndex] = { ...appState.stocks[existingIndex], ...newStock };
+        } else {
+            // 添加新股票
+            appState.stocks.push(newStock);
+        }
+    });
+    
+    // 重新渲染
+    renderStockList();
+    updateAssetOverview();
+    
+    // 默认选中第一个
+    if (appState.stocks.length > 0) {
+        selectStock(0);
+    }
+}
+
+// 数据分析
+function analyzeData() {
+    if (appState.stocks.length === 0) {
+        alert('请先导入持仓数据');
+        return;
+    }
+    
+    const totalValue = appState.stocks.reduce((sum, s) => sum + (s.price * s.holdQuantity), 0);
+    const totalCost = appState.stocks.reduce((sum, s) => sum + (s.holdCost * s.holdQuantity), 0);
+    const totalPnl = totalValue - totalCost;
+    const pnlPercent = (totalPnl / totalCost * 100).toFixed(2);
+    
+    const aStocks = appState.stocks.filter(s => s.market === 'A股');
+    const hkStocks = appState.stocks.filter(s => s.market === '港股');
+    
+    alert(`持仓分析报告：
+
+总持仓市值：${(totalValue/10000).toFixed(2)}万
+总持仓成本：${(totalCost/10000).toFixed(2)}万
+浮动盈亏：${totalPnl >= 0 ? '+' : ''}${(totalPnl/10000).toFixed(2)}万 (${pnlPercent}%)
+
+A股持仓：${aStocks.length}只
+港股持仓：${hkStocks.length}只
+
+建议：${totalPnl < 0 ? '当前整体亏损，建议关注止损线' : '当前整体盈利，可考虑适当止盈'}`);
+}
+
+// 查看历史
+function viewHistory() {
+    alert('历史记录功能开发中...\n\n将记录每日持仓变化、交易操作、盈亏走势等数据。');
+}
+
 // 页面加载完成后初始化
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () => {
+    init();
+    initDataImport();
+});
