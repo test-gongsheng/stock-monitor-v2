@@ -804,29 +804,11 @@ function showAnalysisModal() {
 
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('页面加载完成，开始初始化...');
-    
-    try {
-        init();
-        console.log('初始化完成');
-    } catch (e) {
-        console.error('初始化失败:', e);
-    }
-    
-    try {
+    init();
+    // 数据导入功能在import.js中初始化
+    if (typeof initDataImport === 'function') {
         initDataImport();
-        console.log('数据导入初始化完成');
-    } catch (e) {
-        console.error('数据导入初始化失败:', e);
     }
-    
-    // 检查关键元素是否存在
-    console.log('关键元素检查:', {
-        uploadArea: document.getElementById('uploadArea'),
-        fileInput: document.getElementById('fileInput'),
-        dataImportModal: document.getElementById('dataImportModal'),
-        dataImportBtn: document.querySelector('.btn-header[onclick*="showDataImportModal"]')
-    });
 });
 
 // 确保函数在全局作用域可用（用于HTML内联事件）
