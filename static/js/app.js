@@ -583,8 +583,10 @@ function parseStockData(content) {
 function showDataImportModal() {
     const modal = document.getElementById('dataImportModal');
     if (modal) {
-        modal.classList.add('show');
+        modal.classList.add('active');
         console.log('显示数据导入弹窗');
+    } else {
+        console.error('找不到dataImportModal元素');
     }
 }
 
@@ -592,7 +594,26 @@ function showDataImportModal() {
 function hideDataImportModal() {
     const modal = document.getElementById('dataImportModal');
     if (modal) {
-        modal.classList.remove('show');
+        modal.classList.remove('active');
+    }
+}
+
+// 显示数据分析弹窗
+function showAnalysisModal() {
+    const modal = document.getElementById('analysisModal');
+    if (modal) {
+        modal.classList.add('active');
+        console.log('显示数据分析弹窗');
+    } else {
+        console.error('找不到analysisModal元素');
+    }
+}
+
+// 隐藏数据分析弹窗
+function hideAnalysisModal() {
+    const modal = document.getElementById('analysisModal');
+    if (modal) {
+        modal.classList.remove('active');
     }
 }
 
@@ -781,6 +802,7 @@ document.addEventListener('DOMContentLoaded', () => {
 window.showDataImportModal = showDataImportModal;
 window.hideDataImportModal = hideDataImportModal;
 window.showAnalysisModal = showAnalysisModal;
+window.hideAnalysisModal = hideAnalysisModal;
 window.handleFileUpload = handleFileUpload;
 window.clearFile = clearFile;
 window.switchImportTab = switchImportTab;
