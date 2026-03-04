@@ -462,22 +462,24 @@ function formatMoney(amount) {
 
 // 数据导入功能
 function initDataImport() {
+    console.log('开始初始化数据导入功能...');
+    
     // 获取数据导入相关的DOM元素
     const uploadArea = document.getElementById('uploadArea');
     const fileInput = document.getElementById('fileInput');
-    const dataImportBtn = document.getElementById('dataImportBtn');
     
-    console.log('初始化数据导入功能:', { uploadArea, fileInput, dataImportBtn });
-    
-    // 绑定导入按钮点击事件
-    if (dataImportBtn) {
-        dataImportBtn.addEventListener('click', showDataImportModal);
-    }
+    console.log('获取到的元素:', { 
+        uploadArea: uploadArea ? '找到' : '未找到', 
+        fileInput: fileInput ? '找到' : '未找到'
+    });
     
     // 绑定文件上传区域事件
     if (uploadArea && fileInput) {
+        console.log('开始绑定上传区域事件...');
+        
         // 点击上传区域触发文件选择
         uploadArea.addEventListener('click', (e) => {
+            console.log('点击上传区域');
             if (e.target !== fileInput) {
                 fileInput.click();
             }
@@ -486,35 +488,62 @@ function initDataImport() {
         // 文件选择事件
         fileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
+            console.log('文件选择事件触发:', file ? file.name : '无文件');
             if (file) {
-                console.log('选择文件:', file.name);
                 handleFileUpload(file);
             }
         });
         
-        // 拖拽上传事件
+        // 拖拽上传事件 - 使用捕获阶段确保事件被捕获
+        uploadArea.addEventListener('dragenter', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('dragenter事件触发');
+            uploadArea.classList.add('dragover');
+        }, true);
+        
         uploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            uploadArea.classList.add('dragover');
-        });
+            // 必须调用preventDefault才能允许drop
+            if (e.dataTransfer) {
+                e.dataTransfer.dropEffect = 'copy';
+            }
+        }, true);
         
         uploadArea.addEventListener('dragleave', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            uploadArea.classList.remove('dragover');
-        });
+            console.log('dragleave事件触发');
+            // 检查是否真的离开了uploadArea（而不是进入了子元素）
+            if (!uploadArea.contains(e.relatedTarget)) {
+                uploadArea.classList.remove('dragover');
+            }
+        }, true);
         
         uploadArea.addEventListener('drop', (e) => {
             e.preventDefault();
             e.stopPropagation();
+            console.log('drop事件触发');
             uploadArea.classList.remove('dragover');
-            const file = e.dataTransfer.files[0];
-            if (file) {
-                console.log('拖拽文件:', file.name);
+            
+            // 获取拖拽的文件
+            const files = e.dataTransfer ? e.dataTransfer.files : null;
+            console.log('拖拽的文件数量:', files ? files.length : 0);
+            
+            if (files && files.length > 0) {
+                const file = files[0];
+                console.log('拖拽的文件:', file.name, '类型:', file.type, '大小:', file.size);
                 handleFileUpload(file);
+            } else {
+                console.error('没有获取到文件');
+                alert('未能获取到文件，请重试');
             }
-        });
+        }, true);
+        
+        console.log('上传区域事件绑定完成');
+    } else {
+        console.error('uploadArea或fileInput元素未找到');
     }
     
     // 绑定导入标签页切换
@@ -525,6 +554,8 @@ function initDataImport() {
             switchImportTab(tabName);
         });
     });
+    
+    console.log('数据导入初始化完成');
 }
 
 // 处理文件上传
