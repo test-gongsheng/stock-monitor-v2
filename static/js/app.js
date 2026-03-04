@@ -509,61 +509,81 @@ function handleFileUpload(file) {
     reader.readAsText(file, 'GBK'); // 券商导出文件通常是GBK编码
 }
 
-// 解析持仓数据
+// 解析持仓数据（适配券商导出格式）
 function parseStockData(content) {
+    // 使用GBK编码读取（券商软件通常使用GBK）
     const lines = content.split('\n');
     const stocks = [];
     let isDataSection = false;
+    let headers = [];
     
-    for (const line of lines) {
-        // 跳过空行和分隔线
-        if (!line.trim() || line.includes('---')) continue;
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
         
-        // 检测数据开始（通常是表头后的数据行）
-        if (line.includes('证券代码') || line.includes('股票代码')) {
+        // 跳过空行和分隔线
+        if (!line || line.includes('---') || line.includes('===')) continue;
+        
+        // 检测表头行
+        if (line.includes('证券代码') && line.includes('证券名称')) {
             isDataSection = true;
+            headers = line.split(/\s+/);
             continue;
         }
         
-        // 解析数据行
-        if (isDataSection) {
-            const parts = line.trim().split(/\s+/);
-            if (parts.length >= 10) {
-                const stock = parseStockLine(parts);
-                if (stock) stocks.push(stock);
-            }
+        // 解析数据行（以数字开头的行）
+        if (isDataSection && /^\d/.test(line)) {
+            const stock = parseStockLine(line);
+            if (stock) stocks.push(stock);
         }
     }
     
     if (stocks.length > 0) {
-        // 更新到系统中
         updateStocksFromImport(stocks);
-        alert(`成功导入 ${stocks.length} 只股票数据！`);
+        alert(`成功导入 ${stocks.length} 只股票数据！\n\n已更新持仓信息和中轴价格。`);
         addAlertLog(`导入持仓数据：${stocks.length}只股票`);
     } else {
-        alert('未能解析到股票数据，请检查文件格式');
+        alert('未能解析到股票数据，请检查文件格式是否为券商导出的持仓查询文件');
     }
 }
 
-// 解析单行数据
-function parseStockLine(parts) {
+// 解析单行数据（适配实际券商格式）
+function parseStockLine(line) {
     try {
+        // 按空白字符分割
+        const parts = line.trim().split(/\s+/);
+        if (parts.length < 10) return null;
+        
+        // 提取字段（根据实际格式）
         const code = parts[0];
         const name = parts[1];
-        const shares = parseInt(parts[2]) || 0;
-        const availableShares = parseInt(parts[4]) || 0;
-        const costPrice = parseFloat(parts[5]) || 0;
-        const currentPrice = parseFloat(parts[6]) || 0;
-        const marketValue = parseFloat(parts[7]) || 0;
+        const shares = parseInt(parts[2]) || 0;  // 证券数量
+        const costPrice = parseFloat(parts[5]) || 0;  // 参考成本价
+        const currentPrice = parseFloat(parts[6]) || 0;  // 当前价
+        const marketValue = parseFloat(parts[7]) || 0;  // 最新市值
+        const pnl = parseFloat(parts[8]) || 0;  // 浮动盈亏
+        const pnlPercent = parseFloat(parts[9]) || 0;  // 盈亏比例
+        const exchange = parts[14] || '';  // 交易所名称
         
         // 判断市场类型
         let market = 'A股';
-        if (code.length === 5 || (code.startsWith('0') && code.length === 5)) {
+        if (exchange.includes('港股') || exchange.includes('沪港通') || exchange.includes('深港通')) {
+            market = '港股';
+        } else if (code.length === 5) {
             market = '港股';
         }
         
-        // 计算中轴价格（简化：使用成本价或当前价的平均值）
-        const pivotPrice = costPrice > 0 ? costPrice : currentPrice;
+        // 处理异常成本价（如比亚迪的-1912.943可能是送转股后未调整）
+        let validCostPrice = costPrice;
+        if (costPrice <= 0 || costPrice > currentPrice * 10) {
+            // 如果成本价异常，使用当前价的90%作为估算
+            validCostPrice = currentPrice * 0.9;
+        }
+        
+        // 计算中轴价格
+        const pivotPrice = validCostPrice > 0 ? validCostPrice : currentPrice;
+        
+        // 确定投资上限
+        const investLimit = market === '港股' ? 1500000 : 500000;
         
         return {
             code: code,
@@ -572,18 +592,22 @@ function parseStockLine(parts) {
             price: currentPrice,
             change: 0,
             changePercent: 0,
-            investLimit: market === '港股' ? 1500000 : 500000,
+            investLimit: investLimit,
             holdQuantity: shares,
-            holdCost: costPrice,
+            holdCost: validCostPrice,
             strategy: '基础',
             pivotPrice: pivotPrice,
             baseRatio: 50,
             floatRatio: 50,
             triggerBuy: pivotPrice * 0.92,
-            triggerSell: pivotPrice * 1.08
+            triggerSell: pivotPrice * 1.08,
+            stopLoss: pivotPrice * 0.85,  // 止损线设为-15%
+            marketValue: marketValue,
+            pnl: pnl,
+            pnlPercent: pnlPercent
         };
     } catch (e) {
-        console.error('解析股票数据失败:', e);
+        console.error('解析股票数据失败:', e, '行内容:', line);
         return null;
     }
 }
