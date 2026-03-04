@@ -745,8 +745,44 @@ function viewHistory() {
     alert('历史记录功能开发中...\n\n将记录每日持仓变化、交易操作、盈亏走势等数据。');
 }
 
+// 显示数据分析弹窗
+function showAnalysisModal() {
+    analyzeData();
+}
+
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', () => {
-    init();
-    initDataImport();
+    console.log('页面加载完成，开始初始化...');
+    
+    try {
+        init();
+        console.log('初始化完成');
+    } catch (e) {
+        console.error('初始化失败:', e);
+    }
+    
+    try {
+        initDataImport();
+        console.log('数据导入初始化完成');
+    } catch (e) {
+        console.error('数据导入初始化失败:', e);
+    }
+    
+    // 检查关键元素是否存在
+    console.log('关键元素检查:', {
+        uploadArea: document.getElementById('uploadArea'),
+        fileInput: document.getElementById('fileInput'),
+        dataImportModal: document.getElementById('dataImportModal'),
+        dataImportBtn: document.querySelector('.btn-header[onclick*="showDataImportModal"]')
+    });
 });
+
+// 确保函数在全局作用域可用（用于HTML内联事件）
+window.showDataImportModal = showDataImportModal;
+window.hideDataImportModal = hideDataImportModal;
+window.showAnalysisModal = showAnalysisModal;
+window.handleFileUpload = handleFileUpload;
+window.clearFile = clearFile;
+window.switchImportTab = switchImportTab;
+window.analyzeData = analyzeData;
+window.viewHistory = viewHistory;
